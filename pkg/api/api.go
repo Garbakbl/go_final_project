@@ -12,6 +12,8 @@ func Init() {
 
 	r.Get("/api/nextdate", nextDayHandler)
 	r.Post("/api/task", addTaskHandler)
+	r.Get("/api/task", getTaskHandler)
+	r.Put("/api/task", updateTaskHandler)
 	r.Get("/api/tasks", tasksHandler)
 
 	r.Handle("/*", http.FileServer(http.Dir("./web")))
