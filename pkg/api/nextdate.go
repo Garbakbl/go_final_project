@@ -24,7 +24,7 @@ func NextDate(now time.Time, dstart string, repeat string) (result string, err e
 
 	//нет переноса
 	if repeat == "" {
-		return dstart, nil
+		return "", nil
 	}
 
 	curDeadLine, err := time.Parse(dateFormat, dstart)

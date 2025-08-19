@@ -14,7 +14,9 @@ func Init() {
 	r.Post("/api/task", addTaskHandler)
 	r.Get("/api/task", getTaskHandler)
 	r.Put("/api/task", updateTaskHandler)
+	r.Delete("/api/task", deleteTaskHandler)
 	r.Get("/api/tasks", tasksHandler)
+	r.Post("/api/task/done", doneTaskHandler)
 
 	r.Handle("/*", http.FileServer(http.Dir("./web")))
 	Router = r
