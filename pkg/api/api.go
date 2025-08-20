@@ -10,13 +10,15 @@ var Router chi.Router
 func Init() {
 	r := chi.NewRouter()
 
+	r.Post("/api/signin", signin)
+
 	r.Get("/api/nextdate", nextDayHandler)
-	r.Post("/api/task", addTaskHandler)
-	r.Get("/api/task", getTaskHandler)
-	r.Put("/api/task", updateTaskHandler)
-	r.Delete("/api/task", deleteTaskHandler)
-	r.Get("/api/tasks", tasksHandler)
-	r.Post("/api/task/done", doneTaskHandler)
+	r.With(auth).Post("/api/task", addTaskHandler)
+	r.With(auth).Get("/api/task", getTaskHandler)
+	r.With(auth).Put("/api/task", updateTaskHandler)
+	r.With(auth).Delete("/api/task", deleteTaskHandler)
+	r.With(auth).Get("/api/tasks", tasksHandler)
+	r.With(auth).Post("/api/task/done", doneTaskHandler)
 
 	r.Handle("/*", http.FileServer(http.Dir("./web")))
 	Router = r
