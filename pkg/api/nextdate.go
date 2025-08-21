@@ -74,10 +74,10 @@ func NextDate(now time.Time, dstart string, repeat string) (result string, err e
 			weekdays       []int
 		)
 		//проверяем валидность
-		if len(weekdaysString) > 8 || len(weekdaysString) < 2 {
+		if len(weekdaysString) > 7 || len(weekdaysString) < 1 {
 			return "", errors.New("invalid weekdays count")
 		}
-		for i := 1; i < len(weekdaysString); i++ {
+		for i := 0; i < len(weekdaysString); i++ {
 			weekDay, err := strconv.Atoi(weekdaysString[i])
 			if err != nil || weekDay < 1 || weekDay > 7 {
 				return "", errors.New("invalid weekday")
@@ -148,10 +148,14 @@ func NextDate(now time.Time, dstart string, repeat string) (result string, err e
 				months = append(months, month)
 			}
 		}
-		candidate := curDeadLine.AddDate(0, 0, 1)
-		maxDaysToCheck := 400 // гарантировано покрывает год
 
-		for daysChecked := 0; daysChecked < maxDaysToCheck; daysChecked++ {
+		candidate := curDeadLine.AddDate(0, 0, 1)
+		if candidate.Before(now) {
+			candidate = now.AddDate(0, 0, 1)
+		}
+
+	labelMonthDays:
+		for {
 			candidateDay := candidate.Day()
 			candidateMonth := int(candidate.Month())
 			daysInCandidateMonth := DaysInMonth(candidate)
@@ -174,9 +178,9 @@ func NextDate(now time.Time, dstart string, repeat string) (result string, err e
 					} else {
 						actualDay = daysInCandidateMonth + day + 1 // для отрицательных дней
 					}
-					if actualDay <= daysInCandidateMonth && actualDay == candidateDay && candidate.After(now) {
+					if actualDay <= daysInCandidateMonth && actualDay == candidateDay {
 						result = candidate.Format(dateFormat)
-						break
+						break labelMonthDays
 					}
 				}
 			}
