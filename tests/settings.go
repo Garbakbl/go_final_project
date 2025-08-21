@@ -1,7 +1,7 @@
 package tests
 
-var Port = "TODO_PORT"
-var DBFile = "../<TODO_DBFILE"
+var Port = 7540
+var DBFile = "../data/sheduler.db"
 
 var FullNextDate = true
 var Search = true
