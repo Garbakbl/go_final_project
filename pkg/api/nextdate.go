@@ -18,7 +18,8 @@ func DaysInMonth(t time.Time) int {
 
 func NextDate(now time.Time, dstart string, repeat string) (result string, err error) {
 	// некорректное правило
-	if repeat != "" && repeat != "y" && !strings.HasPrefix(repeat, "d") {
+	if repeat != "" && repeat != "y" && !strings.HasPrefix(repeat, "d") && !strings.HasPrefix(repeat, "w") &&
+		!strings.HasPrefix(repeat, "m") {
 		return "", errors.New("invalid repeat")
 	}
 
@@ -87,19 +88,21 @@ func NextDate(now time.Time, dstart string, repeat string) (result string, err e
 			weekdays = append(weekdays, weekDay)
 		}
 		//если все нормально рассчитываем новую дату
-		curWeekDay := int(now.Weekday())
+		curWeekDay := int(curDeadLine.Weekday())
+		candidate := curDeadLine.AddDate(0, 0, 1)
 		count := 0
 	labelWeekDays:
 		for {
 			curWeekDay = (curWeekDay + 1) % 7
 			count++
 			for _, v := range weekdays {
-				if curWeekDay == v {
+				candidate = curDeadLine.AddDate(0, 0, count)
+				if curWeekDay == v && candidate.After(now) {
 					break labelWeekDays
 				}
 			}
 		}
-		result = now.AddDate(0, 0, count).Format(dateFormat)
+		result = candidate.Format(dateFormat)
 	}
 
 	// перенос на заданный день месяца
@@ -145,7 +148,7 @@ func NextDate(now time.Time, dstart string, repeat string) (result string, err e
 				months = append(months, month)
 			}
 		}
-		candidate := now.AddDate(0, 0, 1)
+		candidate := curDeadLine.AddDate(0, 0, 1)
 		maxDaysToCheck := 400 // гарантировано покрывает год
 
 		for daysChecked := 0; daysChecked < maxDaysToCheck; daysChecked++ {
@@ -171,8 +174,9 @@ func NextDate(now time.Time, dstart string, repeat string) (result string, err e
 					} else {
 						actualDay = daysInCandidateMonth + day + 1 // для отрицательных дней
 					}
-					if actualDay > 0 && actualDay <= daysInCandidateMonth && actualDay == candidateDay {
+					if actualDay <= daysInCandidateMonth && actualDay == candidateDay && candidate.After(now) {
 						result = candidate.Format(dateFormat)
+						break
 					}
 				}
 			}
