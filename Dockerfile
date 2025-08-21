@@ -1,5 +1,5 @@
 # Шаг 1: билдим go-бинарник
-FROM golang:1.24.4 AS builder
+FROM golang:1.24 AS builder
 WORKDIR /planner
 
 COPY go.mod go.sum ./
@@ -9,14 +9,14 @@ COPY . ./
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app
 
 # Шаг 2: минимальный Ubuntu-образ
-FROM ubuntu:minimal
+FROM ubuntu:22.04
 
 WORKDIR /planner
 
 COPY --from=builder /planner/app .
 COPY --from=builder /planner/web ./web
 
-ENV TODO_DBFILE=scheduler.db
+ENV TODO_DBFILE=data/scheduler.db
 ENV TODO_PORT=7540
 ENV TODO_PASSWORD=123456
 
