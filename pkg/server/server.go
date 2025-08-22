@@ -9,6 +9,9 @@ import (
 
 func Run() error {
 	port := os.Getenv("TODO_PORT")
+	if port == "" {
+		port = "7540"
+	}
 	fmt.Printf("Listening on port %s...\n", port)
 	err := http.ListenAndServe(":"+port, api.Router)
 	if err != nil {

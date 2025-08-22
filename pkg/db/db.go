@@ -18,12 +18,14 @@ var (
     `
 
 	DBFilePath = os.Getenv("TODO_DBFILE")
-
-	db *sql.DB
+	db         *sql.DB
 )
 
 func Init(dbFile string) error {
 	var newDB bool
+	if dbFile == "" {
+		dbFile = "data/scheduler.db"
+	}
 	_, err := os.Stat(dbFile)
 	if err != nil {
 		newDB = true

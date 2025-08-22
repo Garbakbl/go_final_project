@@ -24,10 +24,18 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+func checkPassword(password string) string {
+	if password == "" {
+		password = "123456"
+	}
+	return password
+}
+
 func signin(w http.ResponseWriter, r *http.Request) {
 	var pass Credentials
 	json.NewDecoder(r.Body).Decode(&pass)
 	err := validator.New().Struct(&pass)
+	PASSWORD = checkPassword(PASSWORD)
 	if err != nil || pass.Password != PASSWORD {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusUnauthorized)
@@ -55,6 +63,7 @@ func signin(w http.ResponseWriter, r *http.Request) {
 func auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// смотрим наличие пароля
+		PASSWORD = checkPassword(PASSWORD)
 		if len(PASSWORD) > 0 {
 			var tokenString string // JWT-токен из куки
 
