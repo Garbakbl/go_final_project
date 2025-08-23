@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -59,6 +60,10 @@ func Tasks(limit int, query string) ([]*Task, error) {
 		}
 		tasks = append(tasks, &task)
 	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
 	return tasks, nil
 }
 
@@ -90,11 +95,11 @@ func UpdateTask(task *Task) error {
 func DeleteTask(id string) error {
 	res, err := db.Exec("DELETE FROM scheduler WHERE id = ?", id)
 	if err != nil {
-		return err
+		return fmt.Errorf(`internal server error`)
 	}
 	rowsAffected, _ := res.RowsAffected()
 	if rowsAffected == 0 {
-		return fmt.Errorf(`incorrect id for deleting task`)
+		return fmt.Errorf(`nothing to delete`)
 	}
 	return nil
 }
