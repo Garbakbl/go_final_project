@@ -18,15 +18,8 @@ type Task struct {
 
 func AddTask(task *Task) (int64, error) {
 	var id int64
-
-	query := `INSERT INTO scheduler (date, title, comment, repeat) VALUES (:date, :title, :comment, :repeat)`
-	res, err := db.Exec(query, sql.Named("date", task.Date),
-		sql.Named("title", task.Title),
-		sql.Named("comment", task.Comment),
-		sql.Named("repeat", task.Repeat))
-	if err == nil {
-		id, err = res.LastInsertId()
-	}
+	query := `INSERT INTO scheduler (date, title, comment, repeat) VALUES ($1, $2, $3, $4) RETURNING id;`
+	err := db.QueryRow(query, task.Date, task.Title, task.Comment, task.Repeat).Scan(&id)
 	return id, err
 }
 
@@ -37,13 +30,13 @@ func Tasks(limit int, query string) ([]*Task, error) {
 		rows  *sql.Rows
 	)
 	if query == "" {
-		rows, err = db.Query("SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date LIMIT ?", limit)
+		rows, err = db.Query("SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date LIMIT $1", limit)
 	} else if date, err := time.Parse("02.01.2006", query); err == nil {
 		dateQuery := date.Format("20060102")
-		rows, err = db.Query("SELECT id, date, title, comment, repeat FROM scheduler WHERE date = ? LIMIT ?", dateQuery, limit)
+		rows, err = db.Query("SELECT id, date, title, comment, repeat FROM scheduler WHERE date = $1 LIMIT $2", dateQuery, limit)
 	} else {
 		pattern := "%" + query + "%"
-		rows, err = db.Query("SELECT id, date, title, comment, repeat FROM scheduler WHERE title LIKE ? OR comment LIKE ? LIMIT ?", pattern, pattern, limit)
+		rows, err = db.Query("SELECT id, date, title, comment, repeat FROM scheduler WHERE title LIKE $1 OR comment LIKE $2 LIMIT $3", pattern, pattern, limit)
 	}
 	if err != nil {
 		return tasks, err
@@ -69,14 +62,14 @@ func Tasks(limit int, query string) ([]*Task, error) {
 
 func GetTask(id string) (*Task, error) {
 	var task Task
-	row := db.QueryRow("SELECT id, date, title, comment, repeat FROM scheduler WHERE id = ?", id)
+	row := db.QueryRow("SELECT id, date, title, comment, repeat FROM scheduler WHERE id = $1", id)
 	err := row.Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
 	return &task, err
 }
 
 func UpdateTask(task *Task) error {
 	// параметры пропущены, не забудьте указать WHERE
-	query := `UPDATE scheduler SET title = ?, comment = ?, repeat = ? WHERE id = ?`
+	query := `UPDATE scheduler SET title = $1, comment = $2, repeat = $3 WHERE id = $4`
 	res, err := db.Exec(query, task.Title, task.Comment, task.Repeat, task.ID)
 	if err != nil {
 		return err
@@ -93,7 +86,7 @@ func UpdateTask(task *Task) error {
 }
 
 func DeleteTask(id string) error {
-	res, err := db.Exec("DELETE FROM scheduler WHERE id = ?", id)
+	res, err := db.Exec("DELETE FROM scheduler WHERE id = $1", id)
 	if err != nil {
 		return fmt.Errorf(`internal server error`)
 	}
@@ -105,7 +98,7 @@ func DeleteTask(id string) error {
 }
 
 func UpdateTaskDate(id, date string) error {
-	_, err := db.Exec("UPDATE scheduler SET date = ? WHERE id = ?", date, id)
+	_, err := db.Exec("UPDATE scheduler SET date = $1 WHERE id = $2", date, id)
 	if err != nil {
 		return err
 	}

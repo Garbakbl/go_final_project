@@ -68,7 +68,7 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]any{"error": "db error"})
+		json.NewEncoder(w).Encode(map[string]any{"error": "db error" + err.Error()})
 		return
 	}
 

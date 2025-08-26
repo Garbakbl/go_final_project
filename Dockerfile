@@ -16,10 +16,6 @@ WORKDIR /planner
 COPY --from=builder /planner/app .
 COPY --from=builder /planner/web ./web
 
-ENV TODO_DBFILE=data/scheduler.db
-ENV TODO_PORT=7540
-ENV TODO_PASSWORD=123456
-
 EXPOSE 7540
 
 CMD ["./app"]

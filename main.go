@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	err := db.Init(db.DBFilePath)
+	err := db.Init()
 	if err != nil {
 		log.Fatal(err)
 	}

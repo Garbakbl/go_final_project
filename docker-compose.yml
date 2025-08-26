@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    depends_on:
+      - postgres
+    environment:
+      - TODO_PORT=${TODO_PORT}
+      - TODO_PASSWORD=${TODO_PASSWORD}
+      - PG_DSN=host=postgres port=${POSTGRES_PORT} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DBN} sslmode=${POSTGRES_SSL_MODE}
+    ports:
+      - "${TODO_PORT}:${TODO_PORT}"
+
+volumes:
+  pgdata:

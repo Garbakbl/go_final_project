@@ -2,41 +2,38 @@ package db
 
 import (
 	"database/sql"
-	_ "modernc.org/sqlite"
+	_ "github.com/lib/pq"
 	"os"
 )
 
 var (
-	schema = `CREATE TABLE scheduler (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    date CHAR(8) NOT NULL DEFAULT "",
-    title VARCHAR(128) NOT NULL DEFAULT "",
-    comment TEXT DEFAULT "",
-    repeat VARCHAR(128) DEFAULT "");
+	schema = `CREATE TABLE IF NOT EXISTS scheduler (
+    id SERIAL PRIMARY KEY,
+    date CHAR(8) NOT NULL DEFAULT '',
+    title VARCHAR(128) NOT NULL DEFAULT '',
+    comment TEXT DEFAULT '',
+    repeat VARCHAR(128) DEFAULT '');
 
-	CREATE INDEX date_index ON scheduler (date);
+	CREATE INDEX IF NOT EXISTS date_index ON scheduler (date);
     `
 
-	DBFilePath = os.Getenv("TODO_DBFILE")
-	db         *sql.DB
+	db *sql.DB
 )
 
-func Init(dbFile string) error {
-	var newDB bool
-	if dbFile == "" {
-		dbFile = "data/scheduler.db"
-	}
-	_, err := os.Stat(dbFile)
+func Init() error {
+	// Получаем параметры из переменных окружения
+	dsn := os.Getenv("PG_DSN")
+
+	var err error
+	db, err = sql.Open("postgres", dsn)
 	if err != nil {
-		newDB = true
-		err = nil
+		return err
 	}
-
-	db, err = sql.Open("sqlite", dbFile)
 	err = db.Ping()
-
-	if newDB {
-		_, err = db.Exec(schema)
+	if err != nil {
+		return err
 	}
+
+	_, err = db.Exec(schema)
 	return err
 }
