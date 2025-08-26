@@ -9,9 +9,25 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	"go_final_project/pkg/api"
+	"go_final_project/pkg/db"
+	"go_final_project/pkg/server"
 )
+
+func TestMain(m *testing.M) {
+	if err := db.Init(); err != nil {
+		panic(err)
+	}
+	api.Init()
+	go func() { _ = server.Run() }()
+	time.Sleep(2 * time.Second)
+	code := m.Run()
+	os.Exit(code)
+}
 
 func getURL(path string) string {
 	port := Port
