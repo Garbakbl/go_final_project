@@ -2,8 +2,10 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	_ "github.com/lib/pq"
 	"os"
+	"time"
 )
 
 var (
@@ -24,14 +26,31 @@ func Init() error {
 	// Получаем параметры из переменных окружения
 	dsn := os.Getenv("PG_DSN")
 
+	// Параметры ретрая
+	const maxAttempts = 10
+	const retryInterval = 2 * time.Second
+
 	var err error
-	db, err = sql.Open("postgres", dsn)
-	if err != nil {
-		return err
+	for attempts := 1; attempts <= maxAttempts; attempts++ {
+		db, err = sql.Open("postgres", dsn)
+		if err != nil {
+			// Маловероятно, обычно ошибка будет на .Ping()
+			time.Sleep(retryInterval)
+			continue
+		}
+
+		err = db.Ping()
+		if err == nil {
+			break // успех, база доступна
+		}
+
+		// Соединиться не удалось — ждём и пробуем снова
+		time.Sleep(retryInterval)
 	}
-	err = db.Ping()
+
+	// Если не удалось подключиться после всех попыток, возвращаем ошибку
 	if err != nil {
-		return err
+		return errors.New("could not connect to Postgres after retries: " + err.Error())
 	}
 
 	_, err = db.Exec(schema)
