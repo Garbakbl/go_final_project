@@ -22,9 +22,16 @@ var (
 	db *sql.DB
 )
 
+func getDSN() string {
+	env := os.Getenv("PG_DSN")
+	if env != "" {
+		return env
+	}
+	// Поменяй user, password, dbname под свою конфигурацию!
+	return "user=scheduler password=123456 dbname=scheduler sslmode=disable"
+}
+
 func Init() error {
-	// Получаем параметры из переменных окружения
-	dsn := os.Getenv("PG_DSN")
 
 	// Параметры ретрая
 	const maxAttempts = 10
@@ -32,7 +39,7 @@ func Init() error {
 
 	var err error
 	for attempts := 1; attempts <= maxAttempts; attempts++ {
-		db, err = sql.Open("postgres", dsn)
+		db, err = sql.Open("postgres", getDSN())
 		if err != nil {
 			// Маловероятно, обычно ошибка будет на .Ping()
 			time.Sleep(retryInterval)

@@ -20,7 +20,7 @@ type Task struct {
 
 // Верни postgres Data Source Name из переменной окружения или значения по умолчанию.
 func getDSN() string {
-	env := os.Getenv("TODO_DSN")
+	env := os.Getenv("PG_DSN")
 	if env != "" {
 		return env
 	}
