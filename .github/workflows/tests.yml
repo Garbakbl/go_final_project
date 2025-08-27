@@ -12,8 +12,8 @@ jobs:
           - 5432:5432
         env:
           POSTGRES_USER: scheduler
-          POSTGRES_PASSWORD: scheduler
-          POSTGRES_DB: 123456
+          POSTGRES_PASSWORD: 123456
+          POSTGRES_DB: scheduler
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
