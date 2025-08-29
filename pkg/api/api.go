@@ -3,6 +3,8 @@ package api
 import (
 	"github.com/go-chi/chi/v5"
 	"net/http"
+	"path/filepath"
+	"runtime"
 )
 
 var Router chi.Router
@@ -20,6 +22,10 @@ func Init() {
 	r.With(auth).Get("/api/tasks", tasksHandler)
 	r.With(auth).Post("/api/task/done", doneTaskHandler)
 
-	r.Handle("/*", http.FileServer(http.Dir("./web")))
+	_, thisFile, _, _ := runtime.Caller(0)
+	projectRoot := filepath.Join(filepath.Dir(thisFile), "..", "..") // путь к корню проекта
+	absWeb := filepath.Join(projectRoot, "web")
+	r.Handle("/*", http.FileServer(http.Dir(absWeb)))
+
 	Router = r
 }
