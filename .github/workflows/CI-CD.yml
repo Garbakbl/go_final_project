@@ -29,6 +29,12 @@ jobs:
           # Собираем DSN из кусочков:
           echo "PG_DSN=postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:$POSTGRES_PORT/$POSTGRES_DB?sslmode=$POSTGRES_SSL_MODE" >> $GITHUB_ENV
 
+      - name: Debug envs
+        run: |
+          echo "POSTGRES_USER=$POSTGRES_USER"
+          echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD"
+          echo "PG_DSN=$PG_DSN"
+
       # Запускаем postgres (как сервис)
       - name: Start Postgres
         uses: ankane/setup-postgres@v1
