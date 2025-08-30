@@ -1,0 +1,288 @@
+definitions:
+  api.Credentials:
+    properties:
+      password:
+        type: string
+    type: object
+  api.Response:
+    properties:
+      id:
+        type: integer
+    type: object
+  api.TasksResp:
+    properties:
+      tasks:
+        items:
+          $ref: '#/definitions/db.Task'
+        type: array
+    type: object
+  db.Task:
+    properties:
+      comment:
+        type: string
+      date:
+        type: string
+      id:
+        type: string
+      repeat:
+        type: string
+      title:
+        type: string
+    required:
+    - title
+    type: object
+info:
+  contact: {}
+  description: '...'
+  title: Tasks API
+  version: "1.0"
+paths:
+  /api/nextdate:
+    get:
+      description: Вычисляет дату следующего выполнения задачи исходя из текущей даты,
+        даты последнего выполнения и правила повторения.
+      parameters:
+      - description: Текущее время в формате 20060102 (YYYYMMDD). Если не указано,
+          используется текущее системное время
+        in: formData
+        name: now
+        type: string
+      - description: Дата старта задачи в формате 20060102 (YYYYMMDD)
+        in: formData
+        name: date
+        required: true
+        type: string
+      - description: Правило повторения (d N, w 1,2,7, m 28 -2 ...)
+        in: formData
+        name: repeat
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Дата следующего выполнения (YYYYMMDD)
+          schema:
+            type: string
+        "400":
+          description: Ошибка, если невалидные параметры
+          schema:
+            type: string
+      summary: Получить дату следующего выполнения задачи
+      tags:
+      - tasks
+  /api/signin:
+    post:
+      consumes:
+      - application/json
+      description: Получить JWT токен по паролю. Пароль можно задать через переменную
+        окружения TODO_PASSWORD (по умолчанию "123456").
+      parameters:
+      - description: Пароль пользователя
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/api.Credentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: JWT токен
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: 'Ошибка: неверный пароль'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Вход в систему (логин)
+      tags:
+      - auth
+  /api/task:
+    delete:
+      description: Удаляет одну задачу по её id
+      parameters:
+      - description: ID задачи
+        in: query
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK (пустой объект)
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Ничего не найдено
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Удалить задачу
+      tags:
+      - tasks
+    get:
+      description: Возвращает одну задачу по её id.
+      parameters:
+      - description: ID задачи
+        in: query
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Данные задачи
+          schema:
+            $ref: '#/definitions/db.Task'
+        "404":
+          description: Задача не найдена
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Получить задачу
+      tags:
+      - tasks
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новую задачу
+      parameters:
+      - description: Новая задача
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/db.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response'
+        "400":
+          description: Ошибка клиента
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Ошибка сервера
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Добавить задачу
+      tags:
+      - tasks
+    put:
+      consumes:
+      - application/json
+      description: Обновляет все поля существующей задачи по её id. Все поля задачи
+        должны быть заполнены.
+      parameters:
+      - description: Данные задачи для обновления
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/db.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешно (пустой объект)
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Ошибка валидации/даты/декодирования
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Задача не найдена
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Обновить задачу
+      tags:
+      - tasks
+  /api/task/done:
+    post:
+      description: Отмечает выполнение задачи. Если задача одиночная — удаляет её.
+        Если повтаряющаяся — переносит на следующую дату.
+      parameters:
+      - description: ID задачи
+        in: query
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Выполнено успешно (пустой объект)
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Задача не найдена
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Внутренняя ошибка
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Отметить задачу как выполненную
+      tags:
+      - tasks
+  /api/tasks:
+    get:
+      description: Возвращает список задач пользователя, с опциональным поиском по
+        подстроке.
+      parameters:
+      - description: Фильтр для поиска по задачам
+        in: query
+        name: search
+        type: string
+      responses:
+        "200":
+          description: Список задач
+          schema:
+            $ref: '#/definitions/api.TasksResp'
+        "500":
+          description: Внутренняя ошибка
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Получить список задач
+      tags:
+      - tasks
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

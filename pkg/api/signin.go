@@ -15,6 +15,9 @@ var (
 	jwtKey   = []byte("very-secret-key")
 )
 
+// Credentials структура для передачи пароля пользователя при входе.
+//
+// swagger:model Credentials
 type Credentials struct {
 	Password string `json:"password"`
 }
@@ -31,6 +34,18 @@ func checkPassword(password string) string {
 	return password
 }
 
+// signin получает пароль пользователя, выдает JWT токен при успехе.
+//
+// @Summary      Вход в систему (логин)
+// @Description  Получить JWT токен по паролю. Пароль можно задать через переменную окружения TODO_PASSWORD (по умолчанию "123456").
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        credentials  body      Credentials  true  "Пароль пользователя"
+// @Success      200          {object}  map[string]string    "JWT токен"
+// @Failure      401          {object}  map[string]interface{} "Ошибка: неверный пароль"
+// @Failure      500          {object}  map[string]interface{} "Внутренняя ошибка"
+// @Router       /api/signin [post]
 func signin(w http.ResponseWriter, r *http.Request) {
 	var pass Credentials
 	json.NewDecoder(r.Body).Decode(&pass)

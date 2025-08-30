@@ -7,6 +7,17 @@ import (
 	"time"
 )
 
+// doneTaskHandler отмечает задачу как выполненную (с учётом повторяемости).
+//
+// @Summary      Отметить задачу как выполненную
+// @Description  Отмечает выполнение задачи. Если задача одиночная — удаляет её. Если повтаряющаяся — переносит на следующую дату.
+// @Tags         tasks
+// @Security     ApiKeyAuth
+// @Param        id   query     string  true  "ID задачи"
+// @Success      200  {object}  map[string]interface{}  "Выполнено успешно (пустой объект)"
+// @Failure      404  {object}  map[string]interface{}  "Задача не найдена"
+// @Failure      500  {object}  map[string]interface{}  "Внутренняя ошибка"
+// @Router       /api/task/done [post]
 func doneTaskHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	task, err := db.GetTask(id)

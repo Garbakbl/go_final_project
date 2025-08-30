@@ -190,6 +190,17 @@ func NextDate(now time.Time, dstart string, repeat string) (result string, err e
 	return result, nil
 }
 
+// nextDayHandler вычисляет следующую дату задачи по правилу повторения.
+//
+// @Summary      Получить дату следующего выполнения задачи
+// @Description  Вычисляет дату следующего выполнения задачи исходя из текущей даты, даты последнего выполнения и правила повторения.
+// @Tags         tasks
+// @Param        now     formData string false "Текущее время в формате 20060102 (YYYYMMDD). Если не указано, используется текущее системное время"
+// @Param        date    formData string true  "Дата старта задачи в формате 20060102 (YYYYMMDD)"
+// @Param        repeat  formData string true  "Правило повторения (d N, w 1,2,7, m 28 -2 ...)"
+// @Success      200 {string} string "Дата следующего выполнения (YYYYMMDD)"
+// @Failure      400 {string} string "Ошибка, если невалидные параметры"
+// @Router       /api/nextdate [get]
 func nextDayHandler(w http.ResponseWriter, r *http.Request) {
 	now, err := time.Parse(dateFormat, r.FormValue("now"))
 	if err != nil {

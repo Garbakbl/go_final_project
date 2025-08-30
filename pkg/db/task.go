@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+// Task — структура задачи
+// swagger:model Task
 type Task struct {
 	ID      string `json:"id"`
 	Date    string `json:"date"`

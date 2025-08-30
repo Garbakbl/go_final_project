@@ -38,6 +38,17 @@ func checkDate(task *db.Task) error {
 	return nil
 }
 
+// @Summary      Добавить задачу
+// @Description  Создаёт новую задачу
+// @Tags         tasks
+// @Accept       json
+// @Produce      json
+// @Param        task body db.Task true "Новая задача"
+// @Success      200 {object} api.Response
+// @Failure      400 {object} map[string]any "Ошибка клиента"
+// @Failure      500 {object} map[string]any "Ошибка сервера"
+// @Router       /api/task [post]
+// @Security     ApiKeyAuth
 func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var task db.Task
 	err := json.NewDecoder(r.Body).Decode(&task)

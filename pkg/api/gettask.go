@@ -6,6 +6,16 @@ import (
 	"net/http"
 )
 
+// getTaskHandler возвращает одну задачу по id.
+//
+// @Summary      Получить задачу
+// @Description  Возвращает одну задачу по её id.
+// @Tags         tasks
+// @Security     ApiKeyAuth
+// @Param        id   query     string  true  "ID задачи"
+// @Success      200  {object}  db.Task  "Данные задачи"
+// @Failure      404  {object}  map[string]interface{}  "Задача не найдена"
+// @Router       /api/task [get]
 func getTaskHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	task, err := db.GetTask(id)

@@ -6,6 +6,17 @@ import (
 	"net/http"
 )
 
+// deleteTaskHandler удаляет задачу по id.
+//
+// @Summary      Удалить задачу
+// @Description  Удаляет одну задачу по её id
+// @Tags         tasks
+// @Security     ApiKeyAuth
+// @Param        id   query     string  true  "ID задачи"
+// @Success      200  {object}  map[string]interface{}  "OK (пустой объект)"
+// @Failure      404  {object}  map[string]interface{}  "Ничего не найдено"
+// @Failure      500  {object}  map[string]interface{}  "Внутренняя ошибка"
+// @Router       /api/task [delete]
 func deleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Query().Get("id")
 	err := db.DeleteTask(id)
