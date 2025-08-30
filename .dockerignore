@@ -1,7 +1,5 @@
 .git
 .github
 .idea
-Dockerfile
 README.md
-docker-compose.yml
 tests
