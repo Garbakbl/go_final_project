@@ -3,5 +3,5 @@
 .idea
 Dockerfile
 README.md
-scheduler.db
+docker-compose.yml
 tests
