@@ -45,6 +45,15 @@ jobs:
           password: ${{ env.POSTGRES_PASSWORD }}
           # порт по умолчанию 5432 — менять только если хочешь кастомно
 
+      - name: Try connect to Postgres with psql
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          echo $PG_DSN
+          PGPASSWORD="$POSTGRES_PASSWORD" psql "$PG_DSN" -c '\dt'
+        env:
+          PG_DSN: ${{ env.PG_DSN }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
