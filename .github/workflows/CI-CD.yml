@@ -25,7 +25,7 @@ jobs:
           --health-retries 10
 
     env:
-      PG_DSN: postgresql://scheduler:123456@localhost:5432/scheduler?sslmode=disable
+      TODO_DSN: postgresql://scheduler:123456@localhost:5432/scheduler?sslmode=disable
 
     steps:
       - uses: actions/checkout@v4
@@ -52,7 +52,7 @@ jobs:
         run: go test -run ^TestApp$ ./tests
         env:
           TODO_PORT: 7540
-          PG_DSN: ${{ env.PG_DSN }}
+          TODO_DSN: ${{ env.TODO_DSN }}
 
   build-and-push:
     runs-on: ubuntu-latest

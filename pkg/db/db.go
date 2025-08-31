@@ -23,11 +23,10 @@ var (
 )
 
 func getDSN() string {
-	env := os.Getenv("PG_DSN")
+	env := os.Getenv("TODO_DSN")
 	if env != "" {
 		return env
 	}
-	// Поменяй user, password, dbname под свою конфигурацию!
 	return "user=scheduler password=123456 dbname=scheduler sslmode=disable"
 }
 

@@ -19,7 +19,7 @@ services:
     environment:
       - TODO_PORT=${TODO_PORT}
       - TODO_PASSWORD=${TODO_PASSWORD}
-      - PG_DSN=host=postgres port=${POSTGRES_PORT} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DB} sslmode=${POSTGRES_SSL_MODE}
+      - TODO_DSN=${TODO_DSN}
     ports:
       - "${TODO_PORT}:${TODO_PORT}"
 
