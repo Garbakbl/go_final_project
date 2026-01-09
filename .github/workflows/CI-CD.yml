@@ -52,7 +52,7 @@ jobs:
         run: go test -run ^TestApp$ ./tests
         env:
           TODO_PORT: 7540
-          TODO_DSN: ${{ env.TODO_DSN }}
+          #TODO_DSN: ${{ env.TODO_DSN }}   можно убрать?
 
   build-and-push:
     runs-on: ubuntu-latest
